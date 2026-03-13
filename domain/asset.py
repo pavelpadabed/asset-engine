@@ -30,7 +30,6 @@ class Asset:
         self._hash = file_hash
         self._metadata = metadata.copy() if metadata else {}
         self._tags = set(tags) if tags else set()
-        self._hash = file_hash
 
     def __repr__(self) -> str:
         return (
