@@ -1,7 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+
 
 class SourceEnum(Enum):
     FILESYSTEM = "filesystem"
@@ -12,8 +12,8 @@ class SourceEnum(Enum):
 
 @dataclass(frozen=True, slots=True)
 class Source:
-    type: SourceEnum
-    path: Optional[Path]
+    source_type: SourceEnum
+    path: Path | None = None
 
     @classmethod
     def filesystem(cls, path: Path) -> "Source":

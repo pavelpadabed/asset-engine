@@ -1,34 +1,35 @@
 from uuid import uuid4, UUID
-from domain.types import Type
+from domain.types import AssetType
 from domain.source import Source
 from domain.state import State
 from domain.tag import Tag
 from domain.hash import FileHash
+from domain.metadata import FileMetadata
 
 class Asset:
     __slots__ = ("_type", "_source", "_id", "_state", "_metadata", "_tags", "_hash")
     def __init__(
-            self, type: Type,
+            self, type: AssetType,
             source: Source,
             file_hash: FileHash,
-            metadata: dict | None = None,
+            metadata: FileMetadata | None = None,
             tags: set[Tag] | None = None,
 
     ) -> None:
-        if not isinstance(type, Type):
+        if not isinstance(type, AssetType):
             raise TypeError("type must be an instance of Type")
         if not isinstance(source, Source):
             raise TypeError("source must be an instance Source")
         if not isinstance(file_hash, FileHash):
             raise TypeError("file_hash must be an instance of FileHash")
-        if metadata is not None and not isinstance(metadata, dict):
-            raise TypeError("metadata must be a dict or None")
+        if metadata is not None and not isinstance(metadata, FileMetadata):
+            raise TypeError("metadata must be FileMetadata")
         self._type = type
         self._source = source
         self._id = uuid4()
         self._state = State.raw()
         self._hash = file_hash
-        self._metadata = metadata.copy() if metadata else {}
+        self._metadata = metadata
         self._tags = set(tags) if tags else set()
 
     def __repr__(self) -> str:
@@ -54,8 +55,8 @@ class Asset:
         return self._state
 
     @property
-    def metadata(self) -> dict:
-        return self._metadata.copy()
+    def metadata(self) -> FileMetadata:
+        return self._metadata
 
     @property
     def tags(self) -> set[Tag]:

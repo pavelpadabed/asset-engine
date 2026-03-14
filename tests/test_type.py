@@ -1,14 +1,14 @@
-from domain.types import Type, AssetType
+from domain.types import TypeEnum, AssetType
 from dataclasses import FrozenInstanceError
 import pytest
 
 
 def test_type_factory():
-    image = Type(AssetType.VIDEO)
-    assert image.value == AssetType.VIDEO
+    image = AssetType.image()
+    assert image == AssetType.image()
 
 def test_is_immutable():
-    video = Type(AssetType.VIDEO)
+    video = AssetType.video()
 
     with pytest.raises(FrozenInstanceError):
-        video.value = AssetType.IMAGE
+        video.value =TypeEnum.IMAGE

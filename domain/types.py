@@ -1,16 +1,32 @@
 from enum import Enum
 from dataclasses import dataclass
 
-class AssetType(Enum):
+class TypeEnum(Enum):
     IMAGE = "image"
     AUDIO = "audio"
     VIDEO = "video"
     PDF = "pdf"
 
 
-@dataclass(frozen=True)
-class Type:
-    value: AssetType
+@dataclass(frozen=True, slots=True)
+class AssetType:
+    value: TypeEnum
+
+    @classmethod
+    def image(cls) -> "AssetType":
+        return cls(TypeEnum.IMAGE)
+
+    @classmethod
+    def audio(cls) -> "AssetType":
+        return cls(TypeEnum.AUDIO)
+
+    @classmethod
+    def video(cls) -> "AssetType":
+        return cls(TypeEnum.VIDEO)
+
+    @classmethod
+    def pdf(cls) -> "AssetType":
+        return cls(TypeEnum.PDF)
 
 
 
