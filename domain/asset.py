@@ -9,14 +9,15 @@ from domain.metadata import FileMetadata
 class Asset:
     __slots__ = ("_type", "_source", "_id", "_state", "_metadata", "_tags", "_hash")
     def __init__(
-            self, type: AssetType,
+            self, asset_type: AssetType,
             source: Source,
             file_hash: FileHash,
             metadata: FileMetadata | None = None,
+
             tags: set[Tag] | None = None,
 
     ) -> None:
-        if not isinstance(type, AssetType):
+        if not isinstance(asset_type, AssetType):
             raise TypeError("type must be an instance of Type")
         if not isinstance(source, Source):
             raise TypeError("source must be an instance Source")
@@ -24,7 +25,7 @@ class Asset:
             raise TypeError("file_hash must be an instance of FileHash")
         if metadata is not None and not isinstance(metadata, FileMetadata):
             raise TypeError("metadata must be FileMetadata")
-        self._type = type
+        self._type = asset_type
         self._source = source
         self._id = uuid4()
         self._state = State.raw()
@@ -39,7 +40,7 @@ class Asset:
         )
 
     @property
-    def type(self) -> "Type":
+    def type(self) -> "AssetType":
         return self._type
 
     @property
