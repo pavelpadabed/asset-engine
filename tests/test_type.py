@@ -11,4 +11,4 @@ def test_is_immutable():
     video = AssetType.video()
 
     with pytest.raises(FrozenInstanceError):
-        video.value =TypeEnum.IMAGE
+        video.kind = TypeEnum.IMAGE

@@ -10,7 +10,7 @@ class TypeEnum(Enum):
 
 @dataclass(frozen=True, slots=True)
 class AssetType:
-    value: TypeEnum
+    kind: TypeEnum
 
     @classmethod
     def image(cls) -> "AssetType":
