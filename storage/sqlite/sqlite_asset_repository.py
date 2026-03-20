@@ -10,8 +10,8 @@ class SqliteAssetRepository(AssetRepository):
 
     def save(self, asset: Asset):
         row = AssetMapper.to_row(asset)
-        cursor = self.connection.cursor()
-        cursor.execute(
+        with self.connection:
+            self.connection.execute(
             "INSERT INTO assets(asset_id, path, asset_type, file_hash, "
             "source, file_size, modified_time) "
             "VALUES(?, ?, ?, ?, ?, ?, ?)",
@@ -25,21 +25,30 @@ class SqliteAssetRepository(AssetRepository):
 
             )
         )
-        self.connection.commit()
 
     def get(self, asset_id: UUID) -> Asset | None:
-        cursor = self.connection.cursor()
-
-        cursor.execute(
+        row = self.connection.execute(
             "SELECT * FROM assets WHERE asset_id = ?",
-            (str(asset_id),))
-
-        row = cursor.fetchone()
+            (str(asset_id),)
+        ).fetchone()
 
         if row is None:
             return None
 
         return AssetMapper.from_row(row)
 
+    def delete(self, asset_id: UUID) -> None:
+        with self.connection:
+            self.connection.execute(
+                "DELETE FROM assets WHERE asset_id = ?",
+                (str(asset_id),)
+            )
+
+    def list(self) -> list[Asset]:
+        rows = self.connection.execute(
+            "SELECT * FROM assets"
+        ).fetchall()
+
+        return [AssetMapper.from_row(row) for row in rows]
 
 
