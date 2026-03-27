@@ -1,4 +1,4 @@
-from typing import Protocol, Iterable
+from typing import Protocol, Iterable, Iterator
 from uuid import UUID
 from datetime import datetime
 from domain.asset import Asset
@@ -10,7 +10,9 @@ class AssetRepository(Protocol):
 
     def get(self, asset_id: UUID) -> None:...
 
-    def list(self) -> Iterable[Asset]:...
+    def iterate(self) -> Iterator[Asset]:...
+
+    def list(self) -> list[Asset]:...
 
     def delete(self, asset_id: UUID) -> None:...
 

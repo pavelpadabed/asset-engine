@@ -1,5 +1,7 @@
 import sqlite3
 from uuid import UUID
+from typing import Iterator
+
 from domain.asset import Asset
 from storage.repositories.asset_repository import AssetRepository
 from storage.mappers.asset_mapper import AssetMapper
@@ -44,11 +46,13 @@ class SqliteAssetRepository(AssetRepository):
                 (str(asset_id),)
             )
 
-    def list(self) -> list[Asset]:
-        rows = self.connection.execute(
+    def iterate(self) -> Iterator[Asset]:
+        for row in self.connection.execute(
             "SELECT * FROM assets"
-        ).fetchall()
+        ):
+            yield AssetMapper.from_row(row)
 
-        return [AssetMapper.from_row(row) for row in rows]
+    def list(self) -> list[Asset]:
+        return list(self.iterate())
 
 
