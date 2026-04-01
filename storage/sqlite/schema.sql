@@ -10,3 +10,9 @@ modified_time TEXT NOT NULL
 
 CREATE INDEX IF NOT EXISTS idx_assets_file_hash
 ON assets(file_hash);
+
+# TODO: normalize tags into separate table
+# tables:
+# assets
+# tags
+# asset_tags (many-to-many)

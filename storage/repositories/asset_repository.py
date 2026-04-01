@@ -25,3 +25,5 @@ class AssetRepository(Protocol):
         start: datetime,
         end: datetime
     )-> Iterable[Asset]:...
+
+    # TODO: implement tag-based filtering (requires DB schema update)

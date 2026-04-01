@@ -8,7 +8,27 @@ from storage.mappers.asset_mapper import AssetMapper
 
 class SqliteAssetRepository(AssetRepository):
     def __init__(self, connection: sqlite3.Connection) -> None:
+        connection.row_factory = sqlite3.Row
         self.connection = connection
+        self._create_tables()
+
+    def _create_tables(self) -> None:
+        self.connection.execute("""
+            CREATE TABLE IF NOT EXISTS assets(
+            asset_id TEXT PRIMARY KEY,
+            path TEXT NOT NULL,
+            asset_type TEXT NOT NULL,
+            file_hash TEXT NOT NULL,
+            source TEXT NOT NULL,
+            file_size INTEGER NOT NULL,
+            modified_time TEXT NOT NULL
+            )
+        """)
+
+        self.connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_assets_file_hash
+            ON assets(file_hash)
+        """)
 
     def save(self, asset: Asset):
         row = AssetMapper.to_row(asset)
@@ -54,5 +74,8 @@ class SqliteAssetRepository(AssetRepository):
 
     def list(self) -> list[Asset]:
         return list(self.iterate())
+
+    # TODO: add tags table and relation (many-to-many)
+    # asset_id ↔ tag
 
 
