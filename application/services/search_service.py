@@ -80,6 +80,9 @@ class SearchService:
                 continue
             yield asset
 
+    # TODO: add support for tag-based search
+    # e.g. search by tag: "interview", "report", etc.
+
 
 
 

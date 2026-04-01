@@ -33,5 +33,8 @@ class IndexService:
                 asset_type
             )
 
+    # TODO: support assigning tags during indexing
+    # e.g. based on filename or future AI classification
+
 
 
