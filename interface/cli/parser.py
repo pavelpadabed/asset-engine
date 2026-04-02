@@ -18,10 +18,19 @@ def create_parser() -> argparse.ArgumentParser:
 
     search_parser = subparsers.add_parser("search", help="Search assets")
     search_parser.add_argument("--name", type=str, help="Filter by name")
-    search_parser.add_argument("--ext", type=str,
-                               help="Filter by extension"
+    search_parser.add_argument(
+        "--ext", type=str,
+        help="Filter by extension"
     )
     search_parser.add_argument("--after", type=str, help="Modified after date")
     search_parser.add_argument("--before", type=str, help="Modified before date")
+    search_parser.add_argument(
+        "--min_size", type=int,
+        help="Filter by minimal file size"
+    )
+    search_parser.add_argument(
+        "--max_size", type=int,
+        help="Filter by maximum file size"
+    )
 
     return parser
