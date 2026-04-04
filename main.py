@@ -1,5 +1,6 @@
 import sqlite3
 from pathlib import Path
+from datetime import datetime
 
 from interface.cli.parser import create_parser
 from storage.sqlite.sqlite_asset_repository import SqliteAssetRepository
@@ -13,6 +14,11 @@ from interface.cli.presenters.asset_presenter import AssetPresenter
 from interface.cli.commands.scan import ScanCommand
 from interface.cli.commands.search import SearchCommand
 from application.criteria.asset_search_criteria import AssetSearchCriteria
+
+def parse_datetime(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    return datetime.fromisoformat(value)
 
 def create_scan_command(
         path: Path,
@@ -53,30 +59,35 @@ def main() -> None:
         hasher = HashCalculator()
         presenter = AssetPresenter()
 
+        try:
+            parsed_after = parse_datetime(args.after)
+            parsed_before = parse_datetime(args.before)
+        except ValueError:
+            print("Invalid date format. Please use ISO format: YYYY-MM-DD")
+            return
+
+        criteria = AssetSearchCriteria(
+            name_contains=args.name,
+            extension=args.ext,
+            modified_after=parsed_after,
+            modified_before=parsed_before,
+            min_size=args.min_size,
+            max_size=args.max_size
+        )
+
         commands = {
-            "scan": lambda: (
-                create_scan_command(
+            "scan": lambda:create_scan_command(
                 args.path,
                 hasher,
                 save_service,
                 presenter
-            ).execute(args.path)
-            ),
+            ).execute(args.path),
 
-            "search": lambda: (
-                create_search_command(
+            "search": lambda:create_search_command(
                 search_service,
                 presenter
-            ).execute(
-                AssetSearchCriteria(
-                    name_contains=args.name,
-                    extension=args.ext,
-                    modified_after=args.after,
-                    modified_before=args.before,
-                    min_size=args.min_size,
-                    max_size=args.max_size
-                )
-            ))
+            ).execute(criteria)
+
         }
 
         command = commands.get(args.command)
