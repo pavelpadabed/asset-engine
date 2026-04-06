@@ -33,4 +33,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Filter by maximum file size"
     )
 
+    subparsers.add_parser("duplicate", help="Search for duplicates")
+
     return parser

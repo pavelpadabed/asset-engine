@@ -30,4 +30,11 @@ class AssetPresenter:
         for ext, c in ext_counter.most_common():
             print(f"{ext}: {c}")
 
+    def show_duplicates(self, duplicates: list[list[Asset]]) -> None:
+        for n, group in enumerate(duplicates, start=1):
+            files = [asset.path.name.lower() for asset in group]
+            print(f"Group {n}:\n  {'\n'.join(files)}\n")
+
+
+
 
