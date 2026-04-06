@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from storage.sqlite.sqlite_asset_repository import SqliteAssetRepository
 from domain.asset import Asset
 
@@ -9,10 +11,8 @@ class DuplicateService:
         self.repository = repository
 
     def detect_duplicates(self) -> list[list[Asset]]:
-        duplicates = {}
+        duplicates = defaultdict(list)
         for asset in self.repository.iterate():
-            if asset.file_hash not in duplicates:
-                duplicates[asset.file_hash] = []
             duplicates[asset.file_hash].append(asset)
 
         return [d for d in duplicates.values() if len(d) > 1]
