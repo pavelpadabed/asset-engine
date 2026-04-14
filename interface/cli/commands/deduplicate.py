@@ -36,7 +36,7 @@ class DeduplicateCommand:
         count_files = decision_result.total_files
         count_groups = decision_result.total_groups
 
-        message = f"Delete {count_files} duplicates from {count_groups}? (y/n)"
+        message = f"Delete {count_files} duplicates from {count_groups} groups? (y/n)"
 
         confirmed = confirm(message)
 
@@ -46,7 +46,7 @@ class DeduplicateCommand:
 
         self.delete_service.delete_assets(assets_to_delete)
 
-        self.presenter.show_deleted(count_files, count_groups)
+        self.presenter.show_deleted(decision_result)
 
         # TODO: Refactor DeduplicateCommand
         # - (Future) Consider extracting user interaction (confirm input)

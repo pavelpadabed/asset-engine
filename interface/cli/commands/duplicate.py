@@ -11,4 +11,4 @@ class DuplicateCommand:
 
     def execute(self) -> None:
         duplicates = self.d_service.detect_duplicates()
-        self.presenter.show_duplicate_result(duplicates)
+        self.presenter.show_duplicates(duplicates)

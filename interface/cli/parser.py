@@ -34,5 +34,9 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     subparsers.add_parser("duplicate", help="Search for duplicates")
+    subparsers.add_parser(
+        "deduplicate",
+        help="Find and delete duplicate files with confirmation"
+    )
 
     return parser
