@@ -35,6 +35,9 @@ class AssetPresenter:
             files = [asset.path.name.lower() for asset in group]
             print(f"Group {n}:\n  {'\n'.join(files)}\n")
 
+    def show_no_duplicates(self) -> None:
+        print("No duplicates found in the scanned data.")
+
 
 
 

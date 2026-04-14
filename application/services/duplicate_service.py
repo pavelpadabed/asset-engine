@@ -1,12 +1,12 @@
 from collections import defaultdict
 
-from storage.sqlite.sqlite_asset_repository import SqliteAssetRepository
+from storage.repositories.asset_repository import AssetRepository
 from domain.asset import Asset
 
 class DuplicateService:
     def __init__(
             self,
-            repository: SqliteAssetRepository
+            repository: AssetRepository
     ) -> None:
         self.repository = repository
 
