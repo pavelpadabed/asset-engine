@@ -2,23 +2,20 @@ from application.services.duplicate_service import DuplicateService
 from application.services.duplicate_resolver import DecisionLayer
 from application.services.delete_service import DeleteService
 from interface.cli.presenters.asset_presenter import AssetPresenter
-
-def confirm(message) -> bool:
-    response = input(message)
-    if response.strip().lower() in ("y", "yes"):
-        return True
-    return False
+from interface.cli.promt.input_handler import InputHandler
 
 class DeduplicateCommand:
     def __init__(
             self, duplicate_service: DuplicateService,
             duplicate_resolver: DecisionLayer,
+            input_handler: InputHandler,
             delete_service: DeleteService,
             presenter: AssetPresenter
     ) -> None:
         self.duplicate_service = duplicate_service
         self.duplicate_resolver = duplicate_resolver
         self.delete_service = delete_service
+        self.input_handler = input_handler
         self.presenter = presenter
 
     def execute(self) -> None:
@@ -38,7 +35,7 @@ class DeduplicateCommand:
 
         message = f"Delete {count_files} duplicates from {count_groups} groups? (y/n)"
 
-        confirmed = confirm(message)
+        confirmed = self.input_handler.confirm(message)
 
         if not confirmed:
             self.presenter.show_no_confirmation()
@@ -48,10 +45,11 @@ class DeduplicateCommand:
 
         self.presenter.show_deleted(decision_result)
 
-        # TODO: Refactor DeduplicateCommand
-        # - (Future) Consider extracting user interaction (confirm input)
-        #   into a separate component (e.g., InputHandler / PromptService).
-       
+# TODO: Improve CLI confirmation message UX
+# - use pluralization for "file/files" and "group/groups"
+# - align wording with presenter output
+# - consider moving message formatting to a separate helper
+
 
 
 

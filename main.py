@@ -15,6 +15,7 @@ from interface.cli.commands.deduplicate import DeduplicateCommand
 from interface.cli.presenters.asset_presenter import AssetPresenter
 from interface.cli.commands.scan import ScanCommand
 from interface.cli.commands.search import SearchCommand
+from interface.cli.promt.input_handler import InputHandler
 from application.criteria.asset_search_criteria import AssetSearchCriteria
 from application.services.duplicate_service import DuplicateService
 from application.services.duplicate_resolver import DecisionLayer
@@ -63,12 +64,14 @@ def create_duplicate_command(
 def create_deduplicate_command(
         duplicate_service: DuplicateService,
         duplicate_resolver: DecisionLayer,
+        input_handler: InputHandler,
         delete_service: DeleteService,
         presenter: AssetPresenter
 ) -> DeduplicateCommand:
     return DeduplicateCommand(
         duplicate_service,
         duplicate_resolver,
+        input_handler,
         delete_service,
         presenter
     )
@@ -91,6 +94,7 @@ def main() -> None:
         hasher = HashCalculator()
         presenter = AssetPresenter()
         duplicate_resolver = DecisionLayer()
+        input_handler = InputHandler()
 
         try:
             parsed_after = parse_datetime(getattr(args, "after", None))
@@ -98,8 +102,6 @@ def main() -> None:
         except ValueError:
             print("Invalid date format. Please use ISO format: YYYY-MM-DD")
             return
-
-
 
         commands = {
             "scan": lambda: create_scan_command(
@@ -129,6 +131,7 @@ def main() -> None:
             "deduplicate": lambda: create_deduplicate_command(
                 duplicate_service,
                 duplicate_resolver,
+                input_handler,
                 delete_service,
                 presenter
             ).execute()
