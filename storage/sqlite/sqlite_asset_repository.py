@@ -2,6 +2,7 @@ import sqlite3
 from uuid import UUID
 from typing import Iterator
 
+from domain.hash import FileHash
 from domain.asset import Asset
 from storage.repositories.asset_repository import AssetRepository
 from storage.mappers.asset_mapper import AssetMapper
@@ -74,6 +75,14 @@ class SqliteAssetRepository(AssetRepository):
 
     def list(self) -> list[Asset]:
         return list(self.iterate())
+
+    def search_by_hash(self, file_hash: FileHash) -> Asset | None:
+        with self.connection:
+            row = self.connection.execute(
+                "SELECT * FROM assets WHERE file_hash = ?",
+                (file_hash.value,)
+            ).fetchone()
+            return AssetMapper.from_row(row) if row is not None else None
 
     # TODO: add tags table and relation (many-to-many)
     # asset_id ↔ tag
