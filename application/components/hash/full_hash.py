@@ -17,3 +17,4 @@ class FullHash:
         return FileHash(digest)
 
 
+print(FileHash)
