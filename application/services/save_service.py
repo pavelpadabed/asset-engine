@@ -1,4 +1,3 @@
-from typing import Iterable
 from enum import Enum
 
 from domain.asset import Asset
@@ -6,7 +5,7 @@ from storage.repositories.asset_repository import AssetRepository
 
 class AssetSaveStatus(Enum):
     NEW = "new"
-    DUPLICATE = "duplicate"
+    ALREADY_INDEXED = "already indexed"
 
 class SaveService:
     def __init__(self, repository: AssetRepository) -> None:
@@ -14,9 +13,9 @@ class SaveService:
 
     def persist(self, asset: Asset) -> AssetSaveStatus:
         status = (
-            AssetSaveStatus.DUPLICATE
+            AssetSaveStatus.ALREADY_INDEXED
             if self.repository.search_by_hash(asset.file_hash)
             else AssetSaveStatus.NEW
         )
-
+        self.repository.save(asset)
         return status

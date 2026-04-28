@@ -13,6 +13,7 @@ from interface.cli.parser import create_parser
 from interface.cli.commands.duplicate import DuplicateCommand
 from interface.cli.commands.deduplicate import DeduplicateCommand
 from interface.cli.presenters.asset_presenter import AssetPresenter
+from interface.cli.presenters.scan_presenter import ScanPresenter
 from interface.cli.commands.scan import ScanCommand
 from interface.cli.commands.search import SearchCommand
 from interface.cli.promt.input_handler import InputHandler
@@ -30,7 +31,7 @@ def create_scan_command(
         path: Path,
         hasher: HashCalculator,
         save_service: SaveService,
-        presenter: AssetPresenter
+        scan_presenter: ScanPresenter
 ) -> ScanCommand:
     source = Source.filesystem(path)
     index_service = IndexService(hasher, source)
@@ -40,7 +41,7 @@ def create_scan_command(
         scan_service,
         index_service,
         save_service,
-        presenter
+        scan_presenter
     )
 
 def create_search_command(
@@ -92,6 +93,7 @@ def main() -> None:
 
 
         hasher = HashCalculator()
+        scan_presenter = ScanPresenter()
         presenter = AssetPresenter()
         duplicate_resolver = DecisionLayer()
         input_handler = InputHandler()
@@ -108,7 +110,7 @@ def main() -> None:
                 args.path,
                 hasher,
                 save_service,
-                presenter
+                scan_presenter
             ).execute(args.path),
 
             "search": lambda: create_search_command(
