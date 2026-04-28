@@ -1,4 +1,5 @@
 import sqlite3
+from uuid import uuid4
 from uuid import UUID
 from typing import Iterator
 
@@ -14,40 +15,49 @@ class SqliteAssetRepository(AssetRepository):
         self._create_tables()
 
     def _create_tables(self) -> None:
-        self.connection.execute("""
-            CREATE TABLE IF NOT EXISTS assets(
-            asset_id TEXT PRIMARY KEY,
-            path TEXT NOT NULL,
-            asset_type TEXT NOT NULL,
-            file_hash TEXT NOT NULL,
-            source TEXT NOT NULL,
-            file_size INTEGER NOT NULL,
-            modified_time TEXT NOT NULL
-            )
-        """)
+        with open("storage/sqlite/schema.sql") as f:
+            self.connection.executescript(f.read())
 
-        self.connection.execute("""
-            CREATE INDEX IF NOT EXISTS idx_assets_file_hash
-            ON assets(file_hash)
-        """)
 
     def save(self, asset: Asset):
         row = AssetMapper.to_row(asset)
-        with self.connection:
-            self.connection.execute(
-            "INSERT INTO assets(asset_id, path, asset_type, file_hash, "
-            "source, file_size, modified_time) "
-            "VALUES(?, ?, ?, ?, ?, ?, ?)",
-            (row["asset_id"],
-             row["path"],
-             row["asset_type"],
-             row["file_hash"],
-             row["source"],
-             row["file_size"],
-             row["modified_time"]
+        existing_asset = self.search_by_hash(asset.file_hash)
+        if existing_asset:
+            asset_id = existing_asset.id
+        else:
+            with self.connection:
+                self.connection.execute(
+                    "INSERT INTO assets("
+                    "asset_id, path, asset_type, file_hash,"
+                    "source, file_size, modified_time"
+                    ") VALUES(?,?,?,?,?,?,?)",
+                    (
+                        row["asset_id"],
+                        row["path"],
+                        row["asset_type"],
+                        row["file_hash"],
+                        row["source"],
+                        row["file_size"],
+                        row["modified_time"],
+                    )
+                )
+            asset_id = row["asset_id"]
+        occurrence_id = str(uuid4())
+        scan_id = "test_scan"
 
+        print("OCCURRENCE ASSET ID:", asset_id)
+
+        self.connection.execute(
+            "INSERT INTO occurrences(occurrence_id, asset_id, path, scan_id) "
+            "VALUES(?,?,?,?)",
+            (
+                occurrence_id,
+                str(asset_id),
+                row["path"],
+                scan_id
             )
         )
+
 
     def get(self, asset_id: UUID) -> Asset | None:
         row = self.connection.execute(
@@ -86,5 +96,31 @@ class SqliteAssetRepository(AssetRepository):
 
     # TODO: add tags table and relation (many-to-many)
     # asset_id ↔ tag
+    # TODO (storage design): revisit duplicate handling strategy
+    # Current behavior:
+    # - Every scan persists ALL files (including duplicates)
+    # - DB grows linearly (e.g. 38 → 76 after second scan)
+    # - No uniqueness constraint on file_hash
+    #
+    # Problem:
+    # - DeduplicateService works on DB → sees "duplicates" across scans
+    # - After multiple scans, DB contains repeated entries → misleading results
+    #   (e.g. reports 38 duplicates instead of real 1)
+    #
+    # Important:
+    # - Adding UNIQUE(file_hash) is NOT acceptable
+    #   → it removes information about duplicate occurrences
+    #
+    # Options to consider:
+    # A) Keep current append-only model (MVP, simple, but grows DB)
+    # B) Introduce normalized schema:
+    #     - assets (unique by hash)
+    #     - occurrences (each file instance / scan)
+    # C) Track scan_id / source to distinguish scan sessions
+    #
+    # Goal:
+    # - Preserve real duplicate semantics
+    # - Keep DeduplicateService correct
+    # - Avoid DB pollution across repeated scans
 
 
