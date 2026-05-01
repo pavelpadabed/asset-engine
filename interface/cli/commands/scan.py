@@ -19,6 +19,15 @@ class ScanCommand:
         self.save_service = save_service
         self.presenter = presenter
 
+    def _is_duplicate_in_scan(
+            self, file_hash: FileHash,
+            seen_hashes: set
+    ) -> bool:
+        is_duplicate = file_hash in seen_hashes
+        if not is_duplicate:
+            seen_hashes.add(file_hash)
+        return is_duplicate
+
     def execute(self, path: Path) -> ScanResult:
         start_time = dt.datetime.now()
         descriptors = self.scan_service.scan(path)
@@ -30,11 +39,7 @@ class ScanCommand:
         total_size = 0
         seen_hashes = set()
         for asset in assets:
-            value = asset.file_hash.value
-            is_duplicate = value in seen_hashes
-
-            if not is_duplicate:
-                seen_hashes.add(value)
+            is_duplicate = self._is_duplicate_in_scan(asset.file_hash, seen_hashes)
 
             status = self.save_service.persist(asset)
 

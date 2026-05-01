@@ -1,12 +1,20 @@
 import sqlite3
-from uuid import uuid4
 from uuid import UUID
 from typing import Iterator
+from enum import Enum
 
 from domain.hash import FileHash
 from domain.asset import Asset
+from domain.occurrence import Occurrence
 from storage.repositories.asset_repository import AssetRepository
 from storage.mappers.asset_mapper import AssetMapper
+from storage.mappers.occurrence_mapper import OccurrenceMapper
+
+
+class AssetSaveStatus(Enum):
+    NEW = "new"
+    ALREADY_INDEXED = "already indexed"
+
 
 class SqliteAssetRepository(AssetRepository):
     def __init__(self, connection: sqlite3.Connection) -> None:
@@ -19,8 +27,9 @@ class SqliteAssetRepository(AssetRepository):
             self.connection.executescript(f.read())
 
 
-    def save(self, asset: Asset):
-        row = AssetMapper.to_row(asset)
+    def save(self, asset: Asset, occurrence: Occurrence) -> AssetSaveStatus:
+        asset_row = AssetMapper.to_row(asset)
+        occurrence_row = OccurrenceMapper.to_row(occurrence)
         existing_asset = self.search_by_hash(asset.file_hash)
         if existing_asset:
             asset_id = existing_asset.id
@@ -28,35 +37,37 @@ class SqliteAssetRepository(AssetRepository):
             with self.connection:
                 self.connection.execute(
                     "INSERT INTO assets("
-                    "asset_id, path, asset_type, file_hash,"
+                    "asset_id,asset_type, file_hash,"
                     "source, file_size, modified_time"
                     ") VALUES(?,?,?,?,?,?,?)",
                     (
-                        row["asset_id"],
-                        row["path"],
-                        row["asset_type"],
-                        row["file_hash"],
-                        row["source"],
-                        row["file_size"],
-                        row["modified_time"],
+                        asset_row["asset_id"],
+                        asset_row["asset_type"],
+                        asset_row["file_hash"],
+                        asset_row["source"],
+                        asset_row["file_size"],
+                        asset_row["modified_time"],
                     )
                 )
-            asset_id = row["asset_id"]
-        occurrence_id = str(uuid4())
-        scan_id = "test_scan"
-
-        print("OCCURRENCE ASSET ID:", asset_id)
+            asset_id = asset_row["asset_id"]
 
         self.connection.execute(
             "INSERT INTO occurrences(occurrence_id, asset_id, path, scan_id) "
             "VALUES(?,?,?,?)",
             (
-                occurrence_id,
+                occurrence_row["occurrence_id"],
                 str(asset_id),
-                row["path"],
-                scan_id
+                occurrence_row["path"],
+                occurrence_row["scan_id"]
             )
         )
+
+        status = (
+            AssetSaveStatus.ALREADY_INDEXED
+            if existing_asset else AssetSaveStatus.NEW
+        )
+
+        return status
 
 
     def get(self, asset_id: UUID) -> Asset | None:
@@ -82,6 +93,41 @@ class SqliteAssetRepository(AssetRepository):
             "SELECT * FROM assets"
         ):
             yield AssetMapper.from_row(row)
+
+    def iterate_assets_with_occurrences(self) -> Iterator[tuple[Asset, list[Occurrence]]]:
+        grouped_by_ids = {}
+        for row in self.connection.execute(
+            """
+            SELECT
+                a.asset_id,
+                a.asset_type,
+                a.file_hash,
+                a.source,
+                a.file_size,
+                a.modified_time,
+                
+                o.occurrence_id,
+                o.path,
+                o.scan_id
+            FROM occurrences o
+            JOIN assets a ON o.asset_id = a.asset_id
+            """
+        ):
+            asset_id = row["asset_id"]
+            occurrence = OccurrenceMapper.from_row(row)
+
+            if asset_id not in grouped_by_ids:
+                grouped_by_ids[asset_id] = (
+                    AssetMapper.from_row(row),
+                    [occurrence]
+                )
+            else:
+                grouped_by_ids[asset_id][1].append(occurrence)
+
+        for value in grouped_by_ids.values():
+            yield (value[0], value[1])
+
+
 
     def list(self) -> list[Asset]:
         return list(self.iterate())

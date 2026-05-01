@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS assets(
 asset_id TEXT PRIMARY KEY,
-path TEXT NOT NULL,
 asset_type TEXT NOT NULL,
 file_hash TEXT NOT NULL,
 source TEXT NOT NULL,
