@@ -1,4 +1,3 @@
-from pathlib import Path
 from uuid import UUID
 from datetime import datetime
 from domain.asset import Asset
@@ -9,7 +8,6 @@ from domain.metadata import FileMetadata
 
 FIELDS_MAP = {
     "asset_id": lambda a: str(a.id),
-    "path": lambda a: str(a.path),
     "asset_type": lambda a: a.asset_type.kind.value,
     "file_hash": lambda a: a.file_hash.value,
     "source": lambda a: a.source.source_type.value,
@@ -19,7 +17,6 @@ FIELDS_MAP = {
 
 REVERSE_FIELDS_MAP = {
     "id": lambda r: UUID(r["asset_id"]),
-    "path": lambda r: Path(r["path"]),
     "asset_type": lambda r: AssetType(r["asset_type"]),
     "file_hash": lambda r: FileHash(r["file_hash"]),
     "source": lambda r: Source(SourceEnum(r["source"]))

@@ -20,7 +20,6 @@ class AssetFactory:
         )
 
         return Asset(
-                path=descriptor.path,
                 asset_type=asset_type,
                 source=source,
                 file_hash=file_hash,

@@ -1,5 +1,4 @@
 from uuid import uuid4, UUID
-from pathlib import Path
 from domain.types import AssetType
 from domain.source import Source
 from domain.state import State
@@ -8,18 +7,15 @@ from domain.hash import FileHash
 from domain.metadata import FileMetadata
 
 class Asset:
-    __slots__ = ("_path","_asset_type", "_source", "_id", "_state", "_metadata", "_tags", "_hash")
+    __slots__ = ("_asset_type", "_source", "_id", "_state", "_metadata", "_tags", "_hash")
     def __init__(
-            self, path: Path,
-            asset_type: AssetType,
+            self, asset_type: AssetType,
             source: Source,
             file_hash: FileHash,
             id: UUID | None = None,
             metadata: FileMetadata | None = None,
             tags: set[Tag] | None = None,
     ) -> None:
-        if not isinstance(path, Path):
-            raise TypeError("path must be an instance Path")
         if not isinstance(asset_type, AssetType):
             raise TypeError("type must be an instance of AssetType")
         if not isinstance(source, Source):
@@ -28,7 +24,6 @@ class Asset:
             raise TypeError("file_hash must be an instance of FileHash")
         if metadata is not None and not isinstance(metadata, FileMetadata):
             raise TypeError("metadata must be FileMetadata")
-        self._path = path
         self._asset_type = asset_type
         self._source = source
         self._id = id if id is not None else uuid4()
@@ -42,10 +37,6 @@ class Asset:
             f"Asset(id={self._id}, type={self._asset_type}, "
             f"source={self._source}, state={self._state})"
         )
-
-    @property
-    def path(self) -> Path:
-        return self._path
 
     @property
     def asset_type(self) -> "AssetType":
