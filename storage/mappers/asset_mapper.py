@@ -1,18 +1,16 @@
 from uuid import UUID
-from datetime import datetime
 from domain.asset import Asset
 from domain.source import SourceEnum,Source
 from domain.types import AssetType
 from domain.hash import FileHash
-from domain.metadata import FileMetadata
+
 
 FIELDS_MAP = {
     "asset_id": lambda a: str(a.id),
     "asset_type": lambda a: a.asset_type.kind.value,
     "file_hash": lambda a: a.file_hash.value,
     "source": lambda a: a.source.source_type.value,
-    "file_size": lambda a: a.metadata.size,
-    "modified_time": lambda a: a.metadata.modified_time.isoformat()
+
 }
 
 REVERSE_FIELDS_MAP = {
@@ -33,11 +31,8 @@ class AssetMapper:
 
     @staticmethod
     def from_row(row: dict[str, str | int]) -> Asset:
-        size = row["file_size"]
-        modified_time = datetime.fromisoformat(row['modified_time'])
-        metadata = FileMetadata(size, modified_time)
         kwargs = {
             key: builder(row)
             for key, builder in REVERSE_FIELDS_MAP.items()
         }
-        return Asset(**kwargs, metadata=metadata)
+        return Asset(**kwargs)

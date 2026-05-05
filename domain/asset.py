@@ -4,16 +4,15 @@ from domain.source import Source
 from domain.state import State
 from domain.tag import Tag
 from domain.hash import FileHash
-from domain.metadata import FileMetadata
+
 
 class Asset:
-    __slots__ = ("_asset_type", "_source", "_id", "_state", "_metadata", "_tags", "_hash")
+    __slots__ = ("_asset_type", "_source", "_id", "_state", "_tags", "_hash")
     def __init__(
             self, asset_type: AssetType,
             source: Source,
             file_hash: FileHash,
             id: UUID | None = None,
-            metadata: FileMetadata | None = None,
             tags: set[Tag] | None = None,
     ) -> None:
         if not isinstance(asset_type, AssetType):
@@ -22,14 +21,11 @@ class Asset:
             raise TypeError("source must be an instance Source")
         if not isinstance(file_hash, FileHash):
             raise TypeError("file_hash must be an instance of FileHash")
-        if metadata is not None and not isinstance(metadata, FileMetadata):
-            raise TypeError("metadata must be FileMetadata")
         self._asset_type = asset_type
         self._source = source
         self._id = id if id is not None else uuid4()
         self._state = State.raw()
         self._hash = file_hash
-        self._metadata = metadata
         self._tags = set(tags) if tags else set()
 
     def __repr__(self) -> str:
@@ -53,10 +49,6 @@ class Asset:
     @property
     def state(self) -> "State":
         return self._state
-
-    @property
-    def metadata(self) -> FileMetadata | None:
-        return self._metadata
 
     @property
     def tags(self) -> set[Tag]:

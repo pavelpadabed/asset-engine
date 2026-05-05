@@ -37,30 +37,31 @@ class SqliteAssetRepository(AssetRepository):
             with self.connection:
                 self.connection.execute(
                     "INSERT INTO assets("
-                    "asset_id,asset_type, file_hash,"
-                    "source, file_size, modified_time"
-                    ") VALUES(?,?,?,?,?,?,?)",
+                    "asset_id, asset_type, file_hash, source)"
+                    "VALUES(?,?,?,?)",
                     (
                         asset_row["asset_id"],
                         asset_row["asset_type"],
                         asset_row["file_hash"],
                         asset_row["source"],
-                        asset_row["file_size"],
-                        asset_row["modified_time"],
                     )
                 )
             asset_id = asset_row["asset_id"]
 
-        self.connection.execute(
-            "INSERT INTO occurrences(occurrence_id, asset_id, path, scan_id) "
-            "VALUES(?,?,?,?)",
-            (
-                occurrence_row["occurrence_id"],
-                str(asset_id),
-                occurrence_row["path"],
-                occurrence_row["scan_id"]
+            self.connection.execute(
+                "INSERT INTO occurrences("
+                "occurrence_id, asset_id, path, scan_id, "
+                "file_size, modified_time)"
+                "VALUES(?,?,?,?,?,?)",
+                (
+                    occurrence_row["occurrence_id"],
+                    str(asset_id),
+                    occurrence_row["path"],
+                    occurrence_row["scan_id"],
+                    occurrence_row["file_size"],
+                    occurrence_row["modified_time"]
+                )
             )
-        )
 
         status = (
             AssetSaveStatus.ALREADY_INDEXED

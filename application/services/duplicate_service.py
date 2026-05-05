@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from storage.repositories.asset_repository import AssetRepository
 from domain.asset import Asset
+from domain.occurrence import Occurrence
 
 class DuplicateService:
     def __init__(
@@ -10,9 +11,10 @@ class DuplicateService:
     ) -> None:
         self.repository = repository
 
-    def detect_duplicates(self) -> list[list[Asset]]:
-        duplicates = defaultdict(list)
-        for asset in self.repository.iterate():
-            duplicates[asset.file_hash].append(asset)
-
-        return [d for d in duplicates.values() if len(d) > 1]
+    def detect_duplicates(self) -> list[tuple[Asset,list[Occurrence]]]:
+        return [
+            (asset, occurrences)
+            for asset, occurrences in
+            self.repository.iterate_assets_with_occurrences()
+            if len(occurrences) > 1
+        ]

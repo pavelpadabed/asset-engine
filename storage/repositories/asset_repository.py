@@ -1,10 +1,11 @@
 from typing import Protocol, Iterable, Iterator
 from uuid import UUID
 from datetime import datetime
+
 from domain.asset import Asset
+from domain.occurrence import Occurrence
 from domain.hash import FileHash
 from domain.tag import Tag
-
 from storage.sqlite.sqlite_asset_repository import AssetSaveStatus
 
 class AssetRepository(Protocol):
