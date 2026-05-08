@@ -1,14 +1,14 @@
-from domain.asset import Asset
+from domain.occurrence import Occurrence
 from storage.repositories.asset_repository import AssetRepository
 
 class DeleteService:
     def __init__(self, repository: AssetRepository) -> None:
         self.repository = repository
 
-    def delete_assets(self, assets: list[Asset]) -> None:
-        for asset in assets:
-            asset.path.unlink(missing_ok=True)
-            self.repository.delete(asset.id)
+    def delete_occurrences(self, occurrences: list[Occurrence]) -> None:
+        for occurrence in occurrences:
+            occurrence.path.unlink(missing_ok=True)
+            self.repository.delete(occurrence.id)
 
     # TODO (refactor): improve deletion robustness
     # - handle database errors (try/except)

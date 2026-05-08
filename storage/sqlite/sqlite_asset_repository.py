@@ -31,10 +31,10 @@ class SqliteAssetRepository(AssetRepository):
         asset_row = AssetMapper.to_row(asset)
         occurrence_row = OccurrenceMapper.to_row(occurrence)
         existing_asset = self.search_by_hash(asset.file_hash)
-        if existing_asset:
-            asset_id = existing_asset.id
-        else:
-            with self.connection:
+        with self.connection:
+            if existing_asset:
+                asset_id = existing_asset.id
+            else:
                 self.connection.execute(
                     "INSERT INTO assets("
                     "asset_id, asset_type, file_hash, source)"
@@ -46,7 +46,7 @@ class SqliteAssetRepository(AssetRepository):
                         asset_row["source"],
                     )
                 )
-            asset_id = asset_row["asset_id"]
+                asset_id = asset_row["asset_id"]
 
             self.connection.execute(
                 "INSERT INTO occurrences("

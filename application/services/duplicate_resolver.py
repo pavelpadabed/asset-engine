@@ -1,4 +1,5 @@
 from domain.asset import Asset
+from domain.occurrence import Occurrence
 from application.dto.deduplicate_result import GroupDecision, DecisionResult
 
 class DecisionLayer:
@@ -8,8 +9,12 @@ class DecisionLayer:
         decision_groups = []
 
         for asset, occurrences in  groups:
-            keep = occurrences[0]
-            delete = occurrences[1:]
+            keep = max(occurrences, key=lambda o: o.modified_time)
+            delete = [
+                occurrence
+                for occurrence in occurrences
+                if occurrence != keep
+            ]
 
             decision_groups.append(
                 GroupDecision(to_keep=keep, to_delete=delete)

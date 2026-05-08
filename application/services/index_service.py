@@ -15,7 +15,7 @@ class IndexService:
 
     def index(self,
               descriptors: Iterator[FileDescriptor]
-    ) -> Iterator[Asset]:
+    ) -> Iterator[tuple[Asset, FileDescriptor]]:
 
         for descriptor in descriptors:
             path = descriptor.path
@@ -26,11 +26,14 @@ class IndexService:
 
             file_hash = self.hasher.calculate(path)
 
-            yield AssetFactory.create(
+            yield (
+                AssetFactory.create(
                 descriptor,
                 file_hash,
                 self.source,
                 asset_type
+                ),
+                descriptor
             )
 
     # TODO: support assigning tags during indexing
