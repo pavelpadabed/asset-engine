@@ -1,5 +1,5 @@
 from application.services.search_service import SearchService
-from application.criteria.asset_search_criteria import AssetSearchCriteria
+from application.criteria.occurrence_search_criteria import AssetSearchCriteria
 from tests.test_search_service.fake_repo import FakeRepository
 from tests.helpers.make_asset import make_asset
 

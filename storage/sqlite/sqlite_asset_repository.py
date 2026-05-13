@@ -89,11 +89,17 @@ class SqliteAssetRepository(AssetRepository):
                 (str(asset_id),)
             )
 
-    def iterate(self) -> Iterator[Asset]:
+    def iterate_assets(self) -> Iterator[Asset]:
         for row in self.connection.execute(
             "SELECT * FROM assets"
         ):
             yield AssetMapper.from_row(row)
+
+    def iterate_occurrences(self) -> Iterator[Occurrence]:
+        for row in self.connection.execute(
+            "SELECT * FROM occurrences"
+        ):
+            yield OccurrenceMapper.from_row(row)
 
     def iterate_assets_with_occurrences(self) -> Iterator[tuple[Asset, list[Occurrence]]]:
         grouped_by_ids = {}
@@ -130,8 +136,11 @@ class SqliteAssetRepository(AssetRepository):
 
 
 
-    def list(self) -> list[Asset]:
-        return list(self.iterate())
+    def list_assets(self) -> list[Asset]:
+        return list(self.iterate_assets())
+
+    def list_occurrences(self) -> list[Occurrence]:
+        return list(self.iterate_occurrences())
 
     def search_by_hash(self, file_hash: FileHash) -> Asset | None:
         with self.connection:

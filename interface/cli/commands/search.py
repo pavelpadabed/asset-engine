@@ -1,5 +1,5 @@
 from application.services.search_service import SearchService
-from application.criteria.asset_search_criteria import AssetSearchCriteria
+from application.criteria.occurrence_search_criteria import AssetSearchCriteria
 from interface.cli.presenters.asset_presenter import AssetPresenter
 
 class SearchCommand:

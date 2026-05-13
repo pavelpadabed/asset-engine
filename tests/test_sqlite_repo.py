@@ -125,7 +125,7 @@ def test_empty_list():
 
     repo = SqliteAssetRepository(conn)
 
-    result = repo.list()
+    result = repo.list_assets()
 
     assert result == []
 
@@ -166,7 +166,7 @@ def test_list_with_assets():
     repo.save(asset_1)
     repo.save(asset_2)
 
-    result = repo.list()
+    result = repo.list_assets()
 
     assert len(result) == 2
     assert {r.id for r in result} == {asset_1.id, asset_2.id}

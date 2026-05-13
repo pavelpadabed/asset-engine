@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 @dataclass
-class AssetSearchCriteria:
+class OccurrenceSearchCriteria:
     name_contains: str | None = None
     extension: str | None = None
     modified_after: datetime | None = None
@@ -11,4 +11,3 @@ class AssetSearchCriteria:
     max_size: int | None = None
     # TODO: support tags filtering
     tags: set[str] | None = None
-

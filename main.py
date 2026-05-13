@@ -17,7 +17,7 @@ from interface.cli.presenters.scan_presenter import ScanPresenter
 from interface.cli.commands.scan import ScanCommand
 from interface.cli.commands.search import SearchCommand
 from interface.cli.promt.input_handler import InputHandler
-from application.criteria.asset_search_criteria import AssetSearchCriteria
+from application.criteria.occurrence_search_criteria import AssetSearchCriteria
 from application.services.duplicate_service import DuplicateService
 from application.services.duplicate_resolver import DecisionLayer
 from application.services.delete_service import DeleteService
