@@ -1,162 +1,347 @@
-# Asset Indexer (Work in Progress)
+# Asset Engine
 
-CLI-first tool for indexing, analyzing and searching large file archives.
+Backend-oriented asset indexing and occurrence tracking engine for large filesystem archives.
 
-This project is an experimental backend tool designed to help manage large collections of files.
-It can work with media files, documents, PDFs, spreadsheets and other digital assets.
+Asset Engine is an experimental Python backend project focused on filesystem scanning, indexing pipelines, occurrence-aware storage modeling and archive analysis.
 
-The goal is to create a simple but powerful indexing system that allows fast inspection and search inside large folders and archives.
+The system is designed to inspect large file collections, detect duplicates, build searchable indexes and model physical file occurrences independently from logical asset identity.
 
-The project is currently under active development.
-
----
-
-## Motivation
-
-When working with large archives or production folders, files quickly become difficult to manage:
-
-* hundreds or thousands of files
-* duplicated materials
-* inconsistent file naming
-* forgotten file locations
-* large historical archives
-
-Instead of manually browsing folders, this tool builds an index of files and allows fast inspection of the archive.
+The project focuses on backend architecture, repository abstractions, indexing pipelines and scalable filesystem modeling rather than simple file utility scripting.
 
 ---
 
-## Current MVP Direction
+# Motivation
+
+Large archives quickly become difficult to manage:
+
+- duplicated files
+- inconsistent folder structures
+- forgotten file locations
+- historical archives accumulated over years
+- repeated scans of the same folders
+- lack of searchable indexing
+
+Instead of manually browsing directories, Asset Engine builds an indexed representation of the filesystem and provides analysis and search capabilities over the archive.
+
+---
+
+# Current MVP Direction
 
 The current MVP focuses on:
 
-* scanning large folders and archives
-* creating an index of files
-* storing file metadata in SQLite
-* detecting duplicate files using hashes
-* searching files by name and path
-* filtering by creation or modification date
-* tagging files for easier classification
-* providing archive statistics
+- scanning large filesystem archives
+- building occurrence-aware indexes
+- storing normalized metadata in SQLite
+- duplicate detection using file hashes
+- occurrence-based search pipelines
+- scan session tracking
+- archive statistics and inspection
+- modular CLI orchestration
+- repository-driven storage architecture
 
 ---
 
-## Architecture
+# Core Architectural Idea
 
-The project follows a layered architecture:
+The project separates:
 
-Interface (CLI)
-↓
+- logical asset identity
+- physical filesystem occurrence
+
+This allows the system to model:
+
+- multiple copies of the same asset
+- repeated scan sessions
+- historical archive evolution
+- occurrence-aware duplicate analysis
+
+---
+
+# Domain Model
+
+## Asset
+
+Represents the logical identity of a file.
+
+Asset identity is hash-based.
+
+The Asset entity does not store physical filesystem location.
+
+---
+
+## Occurrence
+
+Represents a physical file instance inside the filesystem.
+
+Occurrence stores:
+
+- path
+- file_size
+- modified_time
+- scan_id
+
+Multiple occurrences may reference the same logical asset.
+
+---
+
+## Scan Session
+
+Each scan execution generates a single `scan_id`.
+
+All occurrences created during the same scan share this identifier.
+
+This allows future implementation of:
+
+- historical scan comparison
+- archive evolution analysis
+- incremental indexing
+- scan reporting
+
+---
+
+# Architecture
+
+The project follows a layered backend architecture:
+
+
+CLI / Interface
+        ↓
 Application Layer
-↓
+        ↓
 Domain
-↓
-Storage (SQLite)
+        ↓
+Storage Layer (SQLite)
 
-This architecture allows replacing the CLI interface with GUI or API in the future without changing the core logic.
+## Current Architecture Components
 
----
+Composition Root
+
+CLI Orchestrators
+
+Application Services
+
+Repository Design
+
+Search Pipeline
+
+Duplicate Detection
 
 ## Project Structure
 
-The repository is organized using a layered architecture separating domain logic, application services and infrastructure.
-
-```
+```text
 asset-engine/
 │
 ├── application/
+│   ├── components/
+│   ├── criteria/
+│   ├── dto/
+│   ├── services/
+│   └── __init__.py
+│
+├── docs/
+│   └── architecture.md
 │
 ├── domain/
+│   ├── factories/
 │   ├── asset.py
+│   ├── occurrence.py
+│   ├── metadata.py
 │   ├── hash.py
-│   ├── tag.py
 │   ├── source.py
 │   ├── state.py
+│   ├── tag.py
 │   ├── types.py
-│   └── exceptions.py
+│   ├── exceptions.py
+│   └── __init__.py
 │
 ├── interface/
+│   └── cli/
+│       └── __init__.py
 │
 ├── storage/
+│   ├── mappers/
+│   ├── repositories/
+│   ├── sqlite/
+│   ├── types/
+│   └── __init__.py
 │
 ├── tests/
-│   ├── test_asset.py
-│   ├── test_state.py
-│   └── test_type.py
+│
+├── utils/
 │
 ├── main.py
-└── README.md
+├── README.md
+├── .gitignore
+└── assets.db
 ```
 
-## Domain Model (current)
+### Composition Root
 
-Entity:
+`main.py`
 
-* Asset
+Responsible only for system wiring:
 
-Value Objects:
+- repositories
+- services
+- CLI commands
 
-* AssetType
-* AssetSource
-* AssetState
-* FileHash
-* Tag
-
-Asset fields include:
-
-* filename
-* full_path
-* size
-* created_at
-* modified_at
-* hash (optional)
-* tags
+No business logic is placed inside the composition root.
 
 ---
 
-## Planned CLI Commands
+### CLI Orchestrators
 
-Examples of commands planned for the CLI interface:
+CLI commands act as use-case orchestrators.
 
-scan archive
+Examples:
 
-search keyword
+- scan
+- search
+- duplicates
 
-duplicates
-
-stats
-
-tag add
-
-tag search
+Orchestrators coordinate services and user interaction flow.
 
 ---
+
+### Application Services
+
+Examples:
+
+- `ScanService`
+- `IndexService`
+- `SearchService`
+- `DuplicateService`
+- `DeleteService`
+
+Services remain isolated and responsibility-focused.
+
+---
+
+## Repository Design
+
+The project uses repository abstractions to isolate storage implementation details.
+
+Current implementation:
+
+- SQLite repository
+
+The repository layer currently supports:
+
+- asset persistence
+- occurrence persistence
+- occurrence iteration
+- occurrence-aware searching
+- duplicate analysis flows
+
+---
+
+## Search Pipeline
+
+The search system operates on filesystem occurrences rather than logical assets.
+
+Current search capabilities include:
+
+- filename search
+- path search
+- extension filtering
+- modification date filtering
+
+The architecture is designed for future extensibility.
+
+---
+
+## Duplicate Detection
+
+Duplicate detection is hash-based.
+
+The system separates:
+
+- duplicate analysis
+- deletion operations
+
+Duplicate discovery is handled by `DuplicateService`.
+
+Deletion operations are delegated to `DeleteService`.
+
+This separation keeps analysis and filesystem mutation independent.
+
+## Engineering Concepts Demonstrated
+
+The project currently demonstrates:
+
+- layered backend architecture
+- repository pattern
+- DTO pipelines
+- orchestration layer design
+- occurrence modeling
+- normalized storage architecture
+- scan session semantics
+- contract-driven development
+- test-driven refactoring
+- filesystem indexing pipelines
+
+---
+
 ## Example Use Cases
 
 ### Media Production Archives
 
-Video production teams often accumulate thousands of media files across many projects.  
-This tool can index the archive and help detect duplicate footage, forgotten assets and inconsistent naming.
+Indexing large collections of footage, project exports and production assets.
 
-### Research and Journalism Archives
+Possible workflows:
 
-Investigative journalism projects often collect large volumes of source material: videos, PDFs, documents and datasets.  
-The index allows fast search and inspection across the archive.
+- duplicate detection
+- archive inspection
+- forgotten footage discovery
+- production archive indexing
 
-### Large Document Collections
+---
 
-Organizations sometimes store thousands of PDFs, spreadsheets and reports across shared folders.  
-The tool helps locate duplicates, search by name and analyze archive structure.
+### Research / Journalism Archives
 
-### Backup Inspection
+Investigative projects often accumulate:
 
-Large backup folders may contain many redundant or outdated files.  
-By indexing the archive and comparing hashes, the tool can detect duplicate files and provide statistics about stored data.
+- videos
+- PDFs
+- screenshots
+- datasets
+- exported documents
 
-### General File Archive Management
+Asset Engine can provide searchable archive indexing and duplicate inspection.
 
-The architecture is not limited to media files and can work with any file types, making it useful for general archive inspection and search.
+---
+
+### Large Historical Archives
+
+Long-term storage folders often contain repeated or outdated copies of files accumulated over years.
+
+Occurrence-aware indexing enables deeper archive analysis.
+
+---
+
+## Future Directions
+
+Planned future exploration areas:
+
+- processor-based pipeline architecture
+- advanced presenter / CLI UX
+- scan reporting
+- tag normalization
+- occurrence history analysis
+- AI-assisted metadata processors
+- semantic indexing pipelines
+
+---
+
 ## Project Status
 
 Work in progress.
 
-The project is being developed incrementally with small commits that reflect the evolution of the design and architecture.
+The project evolves incrementally through architecture-focused refactoring and small isolated commits.
+
+Current focus:
+
+- CLI orchestration
+- presenter UX
+- duplicate cleanup flow
+- occurrence-aware workflows
