@@ -35,6 +35,8 @@ class ScanCommand:
         start_time = dt.datetime.now()
         descriptors = self.scan_service.scan(path)
         indexed_items = self.index_service.index(descriptors)
+
+        scan_id = uuid4()
         total_files = 0
         new_assets = 0
         already_indexed = 0
@@ -46,7 +48,7 @@ class ScanCommand:
                 occurrence_id=uuid4(),
                 asset_id=asset.id,
                 path=descriptor.path,
-                scan_id=uuid4(),
+                scan_id=scan_id,
                 file_size=descriptor.size,
                 modified_time=descriptor.modified_time
             )
@@ -91,10 +93,6 @@ class ScanCommand:
     #     - _update_counters(status, is_duplicate)
     # - Improve naming (value → file_hash_value)
     # - Aim for flatter, more readable flow (less nested conditions)
-    # TODO (refactor): introduce scan session id
-    # - generate one scan_id per ScanCommand execution
-    # - reuse the same scan_id for all occurrences in a single scan
-    # - avoid generating new scan_id for each occurrence
 
 
 
