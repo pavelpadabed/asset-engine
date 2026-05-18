@@ -1,7 +1,6 @@
 import sqlite3
 from uuid import UUID
 from typing import Iterator
-from enum import Enum
 
 from domain.hash import FileHash
 from domain.asset import Asset
@@ -9,11 +8,7 @@ from domain.occurrence import Occurrence
 from storage.repositories.asset_repository import AssetRepository
 from storage.mappers.asset_mapper import AssetMapper
 from storage.mappers.occurrence_mapper import OccurrenceMapper
-
-
-class AssetSaveStatus(Enum):
-    NEW = "new"
-    ALREADY_INDEXED = "already indexed"
+from storage.types.save_status import AssetSaveStatus
 
 
 class SqliteAssetRepository(AssetRepository):
@@ -110,12 +105,12 @@ class SqliteAssetRepository(AssetRepository):
                 a.asset_type,
                 a.file_hash,
                 a.source,
-                a.file_size,
-                a.modified_time,
-                
+                  
                 o.occurrence_id,
                 o.path,
-                o.scan_id
+                o.scan_id,
+                o.file_size,
+                o.modified_time
             FROM occurrences o
             JOIN assets a ON o.asset_id = a.asset_id
             """

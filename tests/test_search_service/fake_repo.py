@@ -1,8 +1,8 @@
-from domain.asset import Asset
+from domain.occurrence import Occurrence
 
 class FakeRepository:
-    def __init__(self, assets: list[Asset]) -> None:
-        self.assets = assets
+    def __init__(self, occurrences: list[Occurrence]) -> None:
+        self.occurrences = occurrences
 
-    def list(self) -> list[Asset]:
-        return self.assets
+    def list_occurrences(self) -> list[Occurrence]:
+        return self.occurrences

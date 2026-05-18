@@ -17,7 +17,7 @@ from interface.cli.presenters.scan_presenter import ScanPresenter
 from interface.cli.commands.scan import ScanCommand
 from interface.cli.commands.search import SearchCommand
 from interface.cli.promt.input_handler import InputHandler
-from application.criteria.occurrence_search_criteria import AssetSearchCriteria
+from application.criteria.occurrence_search_criteria import OccurrenceSearchCriteria
 from application.services.duplicate_service import DuplicateService
 from application.services.duplicate_resolver import DecisionLayer
 from application.services.delete_service import DeleteService
@@ -116,7 +116,7 @@ def main() -> None:
             "search": lambda: create_search_command(
                 search_service,
                 presenter
-            ).execute(criteria = AssetSearchCriteria(
+            ).execute(criteria = OccurrenceSearchCriteria(
             name_contains=args.name,
             extension=args.ext,
             modified_after=parsed_after,

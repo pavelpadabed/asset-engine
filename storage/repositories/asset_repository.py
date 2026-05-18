@@ -6,7 +6,7 @@ from domain.asset import Asset
 from domain.occurrence import Occurrence
 from domain.hash import FileHash
 from domain.tag import Tag
-from storage.sqlite.sqlite_asset_repository import AssetSaveStatus
+from storage.types.save_status import AssetSaveStatus
 
 class AssetRepository(Protocol):
     def save(self, asset: Asset, occurrence: Occurrence) -> AssetSaveStatus:...
