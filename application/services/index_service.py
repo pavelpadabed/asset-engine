@@ -28,7 +28,6 @@ class IndexService:
 
             yield (
                 AssetFactory.create(
-                descriptor,
                 file_hash,
                 self.source,
                 asset_type
