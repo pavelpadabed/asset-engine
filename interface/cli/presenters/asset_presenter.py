@@ -2,6 +2,7 @@ from typing import Iterable
 from collections import Counter
 
 from domain.asset import Asset
+from domain.occurrence import Occurrence
 from utils.time_utils import format_datetime
 from application.dto.deduplicate_result import DecisionResult
 
@@ -36,9 +37,12 @@ class AssetPresenter:
         for ext, c in ext_counter.most_common():
             print(f"{ext}: {c}")
 
-    def show_duplicates(self, duplicates: list[list[Asset]]) -> None:
-        for n, group in enumerate(duplicates, start=1):
-            files = ["  " + asset.path.name.lower() for asset in group]
+    def show_duplicates(
+            self, duplicates: list[tuple[Asset,
+            list[Occurrence]]]
+    ) -> None:
+        for n, (asset, occurrences) in enumerate(duplicates, start=1):
+            files = ["  " + occurrence.path.name.lower() for occurrence in occurrences]
             print(f"Group {n}:\n  {'\n'.join(files)}\n")
 
     def show_no_duplicates(self) -> None:

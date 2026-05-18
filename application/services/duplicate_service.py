@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from storage.repositories.asset_repository import AssetRepository
 from domain.asset import Asset
 from domain.occurrence import Occurrence
