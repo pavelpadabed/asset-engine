@@ -49,6 +49,7 @@ class ScanCommand:
                 asset_id=asset.id,
                 path=descriptor.path,
                 scan_id=scan_id,
+                observed_at=dt.datetime.now(),
                 file_size=descriptor.size,
                 modified_time=descriptor.modified_time
             )

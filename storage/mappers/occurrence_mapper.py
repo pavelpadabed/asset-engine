@@ -9,6 +9,7 @@ FIELDS_MAP = {
     "asset_id": lambda o: str(o.asset_id),
     "path": lambda o: str(o.path),
     "scan_id": lambda o: str(o.scan_id),
+    "observed_at": lambda o: dt.datetime.isoformat(o.observed_at),
     "file_size": lambda o: int(o.file_size),
     "modified_time": lambda o: o.modified_time.isoformat()
 }
@@ -18,6 +19,7 @@ REVERSE_FIELDS_MAP = {
     "asset_id": lambda r: UUID(r["asset_id"]),
     "path": lambda r: Path(r["path"]),
     "scan_id": lambda r: UUID(r["scan_id"]),
+    "observed_at": lambda r: dt.datetime.fromisoformat(r["observed_at"]),
     "file_size": lambda r: int(r["file_size"]),
     "modified_time": lambda r: dt.datetime.fromisoformat(r["modified_time"])
 }

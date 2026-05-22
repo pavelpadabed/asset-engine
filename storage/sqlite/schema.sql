@@ -13,6 +13,7 @@ occurrence_id TEXT PRIMARY KEY,
 asset_id TEXT NOT NULL,
 path TEXT NOT NULL,
 scan_id TEXT NOT NULL,
+observed_at TEXT NOT NULL,
 file_size INTEGER NOT NULL,
 modified_time TEXT NOT NULL,
 FOREIGN KEY(asset_id) REFERENCES assets(asset_id)

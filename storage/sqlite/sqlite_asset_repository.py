@@ -46,13 +46,14 @@ class SqliteAssetRepository(AssetRepository):
             self.connection.execute(
                 "INSERT INTO occurrences("
                 "occurrence_id, asset_id, path, scan_id, "
-                "file_size, modified_time)"
-                "VALUES(?,?,?,?,?,?)",
+                "observed_at, file_size, modified_time)"
+                "VALUES(?,?,?,?,?,?,?)",
                 (
                     occurrence_row["occurrence_id"],
                     str(asset_id),
                     occurrence_row["path"],
                     occurrence_row["scan_id"],
+                    occurrence_row["observed_at"],
                     occurrence_row["file_size"],
                     occurrence_row["modified_time"]
                 )
